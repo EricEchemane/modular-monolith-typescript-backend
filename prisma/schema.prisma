@@ -1,0 +1,21 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Borrower {
+  id             Int      @id @default(autoincrement())
+  firstName      String
+  lastName       String
+  middleName     String
+  email          String
+  contactNumber  String
+  loanableAmount Decimal
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  status         Int      @default(1)
+}

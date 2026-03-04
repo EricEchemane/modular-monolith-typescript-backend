@@ -31,4 +31,20 @@ export class BorrowerService {
   async deleteBorrower(id: number): Promise<void> {
     return this.borrowerRepository.delete(id);
   }
+
+  async updateStatusBasedOnLoanableAmount(
+    id: number,
+  ): Promise<Borrower | null> {
+    const borrower = await this.borrowerRepository.getById(id);
+    if (!borrower) {
+      return null;
+    }
+    const minimumLoanableAmount = 500_000;
+    if (borrower.loanableAmount < minimumLoanableAmount) {
+      await this.borrowerRepository.update(id, { status: 2 });
+    } else {
+      await this.borrowerRepository.update(id, { status: 1 });
+    }
+    return this.borrowerRepository.getById(id);
+  }
 }

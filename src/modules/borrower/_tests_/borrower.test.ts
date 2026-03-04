@@ -9,7 +9,7 @@ import {
 
 class InMemoryBorrowerRepository implements IBorrowerRepository {
   private borrowers: Borrower[] = [];
-  private nextId = 1;
+  private nextId = 0;
 
   async create(borrower: BorrowerCreate): Promise<Borrower> {
     const created: Borrower = {
@@ -76,7 +76,26 @@ describe("BorrowerService", () => {
     });
     expect(updated.email).toBe("john.doe@example.com");
 
+    const updatedBorrower = await service.updateStatusBasedOnLoanableAmount(
+      created.id,
+    );
+    expect(updatedBorrower?.status).toBe(2);
+
+    await service.updateBorrower(created.id, {
+      loanableAmount: 1_000_000,
+    });
+    const updatedBorrower2 = await service.updateStatusBasedOnLoanableAmount(
+      created.id,
+    );
+    expect(updatedBorrower2?.status).toBe(1);
+
     await service.deleteBorrower(created.id);
     const deleted = await service.getBorrowerById(created.id);
+    expect(deleted).toBeNull();
+
+    const notFound = await service.updateStatusBasedOnLoanableAmount(
+      created.id,
+    );
+    expect(notFound).toBeNull();
   });
 });
